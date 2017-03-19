@@ -81,9 +81,11 @@ public class RecebeJogador extends Thread{
     public static synchronized void Rodada(Object pacote, int jogador){
         String saida="\n";
         rodada++;
-        System.out.println("vez do jogador "+ (rodada%numeroDeJogadores)+1);
-        if( (rodada%numeroDeJogadores)+1!=jogador )
+        System.out.println("vez do jogador "+ (rodada%numeroDeJogadores+1));
+        if( (rodada%numeroDeJogadores)+1!=jogador ){
             System.out.println("NAO EH A SUA VEZ");
+            rodada--;   
+        }
         else{                
 
             if(forca.palpite(pacote.toString().charAt(0))){
