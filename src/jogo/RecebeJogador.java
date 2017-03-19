@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package jogo;
 
 import java.io.BufferedReader;
@@ -12,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,7 +17,7 @@ import java.util.logging.Logger;
  * @author mateus
  */
 public class RecebeJogador extends Thread{
-    private Socket client;
+    private Socket client; //socket para o cliente
     static int  numeroDeJogadores =0;
     static Forca forca;
     static ArrayList<Integer> pontos=new ArrayList<>();
@@ -33,11 +30,13 @@ public class RecebeJogador extends Thread{
     
     @Override
     public void run(){
+        long tempoinicial=System.nanoTime();
+        
         incrementaNumeroDeJogadores();
         int jogador=numeroDeJogadores;
         pontos.add(0);
-        
-        while(true){
+        int i=0;
+        while(i<5){
             try{
                 System.out.println("Jogador "+jogador+" entrou ");
                 //CRIA UM PACOTE DE ENTRADA PARA RECEBER MENSAGENS, ASSOCIADO a CONEXaO (p)
@@ -46,7 +45,7 @@ public class RecebeJogador extends Thread{
                 Object msgIn = sServIn.readObject(); //ESPERA (BLOQUEADO) POR UM PACOTE
                 System.out.println(" -S- Palpite Letra recebida" + msgIn);
                 
-                
+                //manda uma cadeia de string com as informacoes da rodada para o jogador
                 String saida=Rodada(msgIn,jogador);
                 
                 
@@ -69,8 +68,19 @@ public class RecebeJogador extends Thread{
             } catch (InterruptedException ex) {
                 Logger.getLogger(RecebeJogador.class.getName()).log(Level.SEVERE, null, ex);
             }
+            i++;
             
+        }//end while
+        
+        try {//fecha conexao com cliente apos 5 rodadas
+            client.close();
+        } catch (IOException ex) {
+            Logger.getLogger(RecebeJogador.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        long tempofinal=System.nanoTime();
+        System.out.println("tempo :"+TimeUnit.NANOSECONDS.toMillis(tempofinal-tempoinicial) + " ms" );
+        
     }
     
     public static synchronized void incrementaNumeroDeJogadores()
@@ -80,7 +90,7 @@ public class RecebeJogador extends Thread{
         System.out.println("Numero de jogadores: "+numeroDeJogadores);
     }
     
-    public static synchronized String  Rodada(Object pacote, int jogador){
+    public static synchronized String  Rodada(Object pacote, int jogador){ // parte sincronizada 
         String saida="\n";
         
         saida+="Vez do jogador "+ ((rodada%numeroDeJogadores)+(int)1)+"\n";
