@@ -101,7 +101,7 @@ public class RecebeJogador extends Thread{
                 saida+="Voce ERROU nao existe essa letra\n";
 
         }
-        saida+=forca.palavraIncompleta+"\n";
+        saida+="Advinhe a palavra: "+forca.palavraIncompleta+"\n";
     
         for(int i=0; i<pontos.size(); i++){
             saida+="Jogador "+(i+1)+" Pontos:  "+pontos.get(i)+"  | ";
